@@ -1,0 +1,8 @@
+build/
+iso/
+*.o
+*.elf
+*.bin
+*.iso
+*.img
+bootloader/multiboot_header.o
