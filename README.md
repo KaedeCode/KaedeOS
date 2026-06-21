@@ -56,3 +56,6 @@ KaedeOS/
 make          # build the ISO image (build/kaedeos.iso)
 make run      # run in QEMU (options: -m 512M -smp 2)
 make clean    # clean temporary files
+```
+
+> **View the Project Roadmap:** [ROADMAP.md](ROADMAP.md)
