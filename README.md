@@ -4,6 +4,35 @@
 The project is created for a deep understanding of computer operation: from booting to memory management and I/O devices.  
 Currently the kernel can boot via GRUB, switch to long mode, and output text to the VGA buffer.
 
+## Screenshot
+
+![KaedeOS booting in QEMU](screenshots/2026-06-21_08-45-47.png)
+
+## Project Structure
+
+```
+KaedeOS/
+├── bootloader/
+│ ├── boot.asm
+│ └── multiboot_header.asm
+├── drivers/
+│ └── vga.c
+├── kernel/
+│ ├── kernel.c
+│ ├── kernel.cpp
+│ └── kernel.rs
+├── libc/
+│ └── string.c
+├── utils/
+│ └── ports.c
+├── .gitignore
+├── LICENSE
+├── Makefile
+├── README.md
+└── linker.ld
+```
+
+
 ## Current Features
 
 - Booting with a Multiboot2 header (GRUB support)
@@ -13,16 +42,6 @@ Currently the kernel can boot via GRUB, switch to long mode, and output text to 
 - Basic VGA driver (text output with position and color)
 - I/O utilities: `inb`/`outb`, `strlen`
 
-## Development Plans
-
-- [ ] Interrupt handling (IDT)
-- [ ] Keyboard driver (PS/2)
-- [ ] Memory management (PMM, VMM)
-- [ ] User space
-- [ ] Filesystem support
-
-## Build and Run
-
 ### Requirements
 
 - `make`
@@ -31,10 +50,9 @@ Currently the kernel can boot via GRUB, switch to long mode, and output text to 
 - `rustc` with target `x86_64-unknown-none`
 - `grub-mkrescue` and `xorriso`
 
-### Commands
+### Build and Run
 
 ```bash
 make          # build the ISO image (build/kaedeos.iso)
 make run      # run in QEMU (options: -m 512M -smp 2)
 make clean    # clean temporary files
-```
