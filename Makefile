@@ -3,22 +3,24 @@ CC=x86_64-elf-gcc
 CXX=x86_64-elf-g++
 RUSTC=rustc
 LD=x86_64-elf-gcc
+
 CFLAGS=-ffreestanding -Wall -Wextra -O2 -m64 -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -fno-stack-protector -fno-pic -fno-pie -Iinclude
 CXXFLAGS=$(CFLAGS) -fno-rtti -fno-exceptions
 RUSTFLAGS=--target x86_64-unknown-none -C panic=abort -C opt-level=2 -C relocation-model=static -C no-redzone -C code-model=large
 LDFLAGS=-T linker.ld -ffreestanding -nostdlib -lgcc -static -no-pie -z max-page-size=0x1000
+
 BUILD_DIR=build
 ISO_DIR=iso
 KERNEL_ELF=$(ISO_DIR)/boot/kernel.elf
 GRUB_CFG=$(ISO_DIR)/boot/grub/grub.cfg
 ISO=kaedeos.iso
 
-ASM_SOURCES=$(wildcard bootloader/*.asm)
-C_SOURCES=$(wildcard kernel/*.c libc/*.c drivers/*.c utils/*.c)
-CPP_SOURCES=$(wildcard kernel/*.cpp)
-RS_SOURCES=$(wildcard kernel/*.rs)
+ASM_SOURCES=$(shell find bootloader kernel -name '*.asm')
+C_SOURCES=$(shell find kernel libc drivers utils -name '*.c')
+CPP_SOURCES=$(shell find kernel -name '*.cpp')
+RS_SOURCES=$(shell find kernel -name '*.rs')
 
-ASM_OBJS=$(patsubst bootloader/%.asm,$(BUILD_DIR)/bootloader/%.o,$(ASM_SOURCES))
+ASM_OBJS=$(patsubst %.asm,$(BUILD_DIR)/%.o,$(ASM_SOURCES))
 C_OBJS=$(patsubst %.c,$(BUILD_DIR)/%_c.o,$(C_SOURCES))
 CPP_OBJS=$(patsubst %.cpp,$(BUILD_DIR)/%_cpp.o,$(CPP_SOURCES))
 RS_OBJS=$(patsubst %.rs,$(BUILD_DIR)/%_rs.o,$(RS_SOURCES))
@@ -33,7 +35,7 @@ $(KERNEL_ELF): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(LD) $(LDFLAGS) -o $@ $^
 
-$(BUILD_DIR)/bootloader/%.o: bootloader/%.asm
+$(BUILD_DIR)/%.o: %.asm
 	@mkdir -p $(dir $@)
 	$(ASM) -f elf64 $< -o $@
 
