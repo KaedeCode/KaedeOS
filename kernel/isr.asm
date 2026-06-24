@@ -31,7 +31,6 @@ inter%1:
     push R10
     push R9
     push R8
-    push RSP
     push RBP
     push RDI
     push RSI
@@ -48,7 +47,6 @@ inter%1:
     pop RSI
     pop RDI
     pop RBP
-    pop RSP
     pop R8
     pop R9
     pop R10
