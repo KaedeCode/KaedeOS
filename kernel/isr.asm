@@ -1,86 +1,68 @@
 extern interrupts_handler
 
 %macro inter 1
-
-section .text
 global inter%1
 inter%1:
-    cmp %1, 8
-    je no_err
-    cmp %1, 10
-    je no_err
-    cmp %1, 11
-    je no_err
-    cmp %1, 12
-    je no_err
-    cmp %1, 13
-    je no_err
-    cmp %1, 14
-    je no_err
-    cmp %1, 17
-    je no_err
-    cmp %1, 21
-    je no_err
-    push 0
-.no_err:
-    push R15
-    push R14
-    push R13
-    push R12
-    push R11
-    push R10
-    push R9
-    push R8
-    push RBP
-    push RDI
-    push RSI
-    push RDX
-    push RCX
-    push RBX
-    push RAX
+    %if %1 == 8 || %1 == 10 || %1 == 11 || %1 == 12 || %1 == 13 || %1 == 14 || %1 == 17 || %1 == 21
+    %else
+        push 0
+    %endif
+
+    push r15
+    push r14
+    push r13
+    push r12
+    push r11
+    push r10
+    push r9
+    push r8
+    push rbp
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+    push rbx
+    push rax
+
     mov rdi, rsp
     call interrupts_handler
-    pop RAX
-    pop RBX
-    pop RCX
-    pop RDX
-    pop RSI
-    pop RDI
-    pop RBP
-    pop R8
-    pop R9
-    pop R10
-    pop R11
-    pop R12
-    pop R13
-    pop R14
-    pop R15
+
+    pop rax
+    pop rbx
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+    pop rbp
+    pop r8
+    pop r9
+    pop r10
+    pop r11
+    pop r12
+    pop r13
+    pop r14
+    pop r15
+
     add rsp, 8
     iretq
+%endmacro
 
-;section .data
-;    dw (inter%1 & 0b1111111111111111)
-;    dw 0x08         ;gdt64.code
-;    db 0
-;    db 0b10001110
-;    dw ((inter%1 >> 16) &  0xFFFF)
-;    dd (inter%1 >> 32)
-;    dd 0
+section .text
+%assign i 0
+%rep 256
+    inter %[i]
+%assign i i + 1
+%endrep
 
+%macro generate_stub_ptr 1
+    dq inter%1
 %endmacro
 
 section .data
-idt_stubs:
-    %assign i 0
-    %rep 256
-    inter i
-    %assign i i + 1
-    %endrep
-
-global idt_stubs_point:
+global idt_stubs_point
 idt_stubs_point:
-    %assign i 0
-    %rep 256
-    dq inter%i
-    %assign i i + 1
-    %endrep
+%assign i 0
+%rep 256
+    generate_stub_ptr %[i]
+%assign i i + 1
+%endrep

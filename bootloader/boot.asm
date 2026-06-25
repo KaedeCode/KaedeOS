@@ -2,6 +2,7 @@ global start
 extern kernel_main
 extern kernel_main_cpp
 extern kernel_main_rs
+extern init_idt
 
 section .text
 bits 32
@@ -102,6 +103,7 @@ entry64:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    call init_idt
     call kernel_main
     call kernel_main_cpp
     call kernel_main_rs

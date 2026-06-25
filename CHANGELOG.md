@@ -67,3 +67,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - (None)
+
+## [0.3.0] - 2026-06-26
+
+### Added
+- Complete implementation of Interrupt Descriptor Table (IDT) and exception handling (Roadmap Step 1 finished).
+- New `init_idt()` function written in C:
+  - Generates the 256-entry IDT using a loop and the `isr_stubs_point` array from assembly.
+  - Correctly splits 64-bit handler addresses into the three required parts (low 16, mid 16, high 32 bits) using bitwise shifts.
+  - Loads the IDT into the CPU using the `lidt` instruction.
+- New `interrupts_handler()` function in C:
+  - Successfully catches CPU exceptions (e.g., Divide Error `#DE`).
+  - Prints "Opps..." to the VGA screen using the VGA driver.
+  - Enters an infinite loop (`while(1)`) to halt the CPU and prevent a Triple Fault, confirming the handler works.
+- Added `sti` (Set Interrupt Flag) instruction inside `kernel_main()` to enable hardware interrupts.
+- New C file `kernel/interrupts.c` to manage the IDT and exception logic.
+
+### Changed
+- Refactored `isr.asm` generation: the NASM macro now generates **only** the 256 ISR stubs and a `idt_stubs_point` array of pointers, moving the actual IDT table generation to C.
+- Updated `boot.asm` to call `init_idt()` during the boot sequence before jumping to the kernel entry points.
+
+### Fixed
+- Fixed the NASM assembly limitation where bitwise shift operators (`>>`) could not be applied to symbol addresses. Logic is now safely handled by the C compiler/linker during runtime initialization.
+- Corrected context saving and stack alignment in the ISR stubs to properly handle error codes and return via `iretq`.
+
+### Removed
+- (None)

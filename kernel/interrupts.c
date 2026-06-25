@@ -1,26 +1,45 @@
 extern void vga_write(const char *s, int row, int col, unsigned char color);
 extern void (*idt_stubs_point[256])();
+#include <stdint.h>
 
-//section .data
-//    dw (inter%1 & 0b1111111111111111)
-//    dw 0x08         ;gdt64.code
-//    db 0
-//    db 0b10001110
-//    dw ((inter%1 >> 16) &  0xFFFF)
-//    dd (inter%1 >> 32)
-//    dd 0
-
-struct ITD {
-    unsigned short;
-    unsigned short;
-    unsigned char;
-    unsigned char;
-    unsigned short;
-    unsigned int;
-    unsigned int;
+struct __attribute__((packed)) IDT_struct {
+    unsigned short offset_low;
+    unsigned short segment_selector;
+    unsigned char ist_flags;
+    unsigned char type_attributes;
+    unsigned short offset_mid;
+    unsigned int offset_high;
+    unsigned int reserved;
 };
 
-struct IDT IDT[256];
+struct __attribute__((packed)) IDT_pointer {
+    unsigned short size;
+    unsigned long pointer;
+};
+
+struct IDT_struct IDT[256];
+
+void init_idt() {
+    for (int i = 0; i <= 255; i++) {
+        uint64_t isp = (uint64_t)idt_stubs_point[i];
+        IDT[i].offset_low = (isp & 0b1111111111111111);
+        IDT[i].segment_selector = 0x08;
+        IDT[i].ist_flags = 0;
+        IDT[i].type_attributes = 0b10001110;
+        IDT[i].offset_mid = ((isp >> 16) &  0xFFFF);
+        IDT[i].offset_high = (isp >> 32);
+        IDT[i].reserved = 0;
+    };
+
+    struct IDT_pointer data = { 0x0FFF, (unsigned long)&IDT };
+
+    __asm__ __volatile__ (
+        "lidt %0"
+        :
+        :"m"(data)
+        :"memory"
+    );
+};
 
 struct RegFrame {
     unsigned long RAX;
@@ -46,36 +65,9 @@ struct RegFrame {
     unsigned long ss;
 };
 
-struct ITD_pointer {
-    unsigned short size;
-    unsigned long pointer;
-};
-
-struct ITD_pointer data = { 0x0FFF, (unsigned long)idt_table_point };
-
 void interrupts_handler(struct RegFrame *pointer) {
-    for (int i = 0; i <= 255; i++) {
-        IDT[i] = {
-    unsigned short;
-    unsigned short;
-    unsigned char;
-    unsigned char;
-    unsigned short;
-    unsigned int;
-    unsigned int;
-}
-    }
-
     struct RegFrame *regs = pointer;
     regs->rflags = regs->rflags | (1 << 9);
-    
-    __asm__ __volatile__ (
-        "lidt %0"
-        :
-        :"m"(data)
-        :"memory"
-    );
-    __asm__ __volatile__ ("sti");
 
     vga_write("Opps...", 0, 0, 0x0F);
     while(1);
