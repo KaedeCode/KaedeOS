@@ -58,22 +58,29 @@ inter%1:
     add rsp, 8
     iretq
 
-section .data
-    dw (inter%1 & 0b1111111111111111)
-    dw 0x08         ;gdt64.code
-    db 0
-    db 0b10001110
-    dw ((inter%1 >> 16) &  0xFFFF)
-    dd (inter%1 >> 32)
-    dd 0
+;section .data
+;    dw (inter%1 & 0b1111111111111111)
+;    dw 0x08         ;gdt64.code
+;    db 0
+;    db 0b10001110
+;    dw ((inter%1 >> 16) &  0xFFFF)
+;    dd (inter%1 >> 32)
+;    dd 0
 
 %endmacro
 
 section .data
-global idt_table
-idt_table:
+idt_stubs:
     %assign i 0
     %rep 256
     inter i
+    %assign i i + 1
+    %endrep
+
+global idt_stubs_point:
+idt_stubs_point:
+    %assign i 0
+    %rep 256
+    dq inter%i
     %assign i i + 1
     %endrep
