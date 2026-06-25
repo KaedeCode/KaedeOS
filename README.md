@@ -2,7 +2,7 @@
 
 **KaedeOS** is my educational 64-bit operating system written from scratch.  
 The project is created for a deep understanding of computer operation: from booting to memory management and I/O devices.  
-Currently the kernel can boot via GRUB, switch to long mode, and output text to the VGA buffer.
+Currently the kernel can boot via GRUB, switch to long mode, and handle CPU exceptions via an Interrupt Descriptor Table (IDT).
 
 ## Screenshot
 
@@ -13,25 +13,28 @@ Currently the kernel can boot via GRUB, switch to long mode, and output text to 
 ```
 KaedeOS/
 ├── bootloader/
-│ ├── boot.asm
-│ └── multiboot_header.asm
+│   ├── boot.asm
+│   └── multiboot_header.asm
 ├── drivers/
-│ └── vga.c
+│   └── vga.c
 ├── kernel/
-│ ├── kernel.c
-│ ├── kernel.cpp
-│ └── kernel.rs
+│   ├── kernel.c
+│   ├── kernel.cpp
+│   ├── kernel.rs
+│   ├── interrupts.c
+│   └── isr.asm
 ├── libc/
-│ └── string.c
+│   └── string.c
 ├── utils/
-│ └── ports.c
+│   └── ports.c
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
 ├── README.md
+├── ROADMAP.md
+├── CHANGELOG.md
 └── linker.ld
 ```
-
 
 ## Current Features
 
@@ -41,6 +44,10 @@ KaedeOS/
 - Three independent entry points in C, C++, and Rust — each outputs its own string to VGA with a unique color
 - Basic VGA driver (text output with position and color)
 - I/O utilities: `inb`/`outb`, `strlen`
+- **Interrupt Descriptor Table (IDT) initialized with 256 ISR stubs**:
+  - Correctly handles error codes (pushes dummy `0` when necessary)
+  - Saves and restores full CPU context across interrupts
+  - Successfully catches CPU exceptions (e.g., Divide Error `#DE`) and prints a message to the VGA screen via a C handler
 
 ### Requirements
 
