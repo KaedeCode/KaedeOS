@@ -1,6 +1,7 @@
 extern void vga_write(const char *s, int row, int col, unsigned char color);
+extern void long_to_hex(unsigned long num, char *buffer);
 extern void (*idt_stubs_point[256])();
-#include <stdint.h>
+#include <stdint.h>;
 
 struct __attribute__((packed)) IDT_struct {
     unsigned short offset_low;
@@ -65,9 +66,18 @@ struct RegFrame {
     unsigned long ss;
 };
 
-void interrupts_handler(struct RegFrame *pointer) {
-    struct RegFrame *regs = pointer;
+const char *FrameName[] = {
+    "RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "RBP", "R8", "R9", "R10", "R11", "R12","R13", "R14", "R15", "err", "rip", "cs", "rfl", "rsp", "ss"};
 
-    vga_write("Opps...", 0, 0, 0x0F);
+void interrupts_handler(struct RegFrame *pointer) {
+    volatile struct RegFrame *regs = pointer;
+    for(unsigned char i = 0; i != 21; i++) {
+        unsigned long value = *(((unsigned long*)regs) + i);
+        vga_write(FrameName[i], i, 0, 0x0f);
+        vga_write(":", i, 3, 0x0f);
+        char buffer[17];
+        long_to_hex(value, buffer);
+        vga_write(buffer, i, 5, 0x0f);
+    };
     while(1);
 }

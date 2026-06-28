@@ -25,7 +25,9 @@ inter%1:
     push rax
 
     mov rdi, rsp
+    sub rsp, 8
     call interrupts_handler
+    add rsp, 8
 
     pop rax
     pop rbx

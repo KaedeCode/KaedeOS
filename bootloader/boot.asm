@@ -104,9 +104,7 @@ entry64:
     mov fs, ax
     mov gs, ax
     call init_idt
-    call kernel_main
-    call kernel_main_cpp
-    call kernel_main_rs
+    sti
     hlt
 
 section .bss
