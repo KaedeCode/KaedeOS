@@ -67,7 +67,6 @@ struct RegFrame {
 
 void interrupts_handler(struct RegFrame *pointer) {
     struct RegFrame *regs = pointer;
-    regs->rflags = regs->rflags | (1 << 9);
 
     vga_write("Opps...", 0, 0, 0x0F);
     while(1);
