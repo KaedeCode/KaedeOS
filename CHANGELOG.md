@@ -93,3 +93,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - (None)
+
+## [0.4.0] - 2026-06-30
+
+### Added
+- **Step 2 completed: Programmable Interrupt Controller (PIC) remapping and PIT timer (∼100 Hz).**
+  - Implemented `ICW()` function to remap the PIC (Master: 0x20, Slave: 0x28) and disable all IRQs except IRQ0.
+  - Initialized PIT channel 0 with a divider of 11931 to generate ~100 Hz interrupts.
+  - Enabled IRQ0 by clearing bit 0 in the master interrupt mask (`outb(0x21, inb(0x21) & 0xFE)`).
+  - Added `pit_handler()` which increments a tick counter and prints "Seconds elapsed: <hex>" every 100 ticks (≈1 second).
+  - Properly sends End‑of‑Interrupt (EOI) to the master PIC in the IRQ0 handler.
+- **New `stdlib.c` and `stdlib.h`** – added `long_to_hex()` function to convert unsigned long to a 16‑character hexadecimal string.
+- **Expanded interrupt infrastructure:**
+  - Introduced `dispatch_table[256]` to route interrupts to specific handlers (exceptions vs. hardware IRQs).
+  - Added `exception_handler()` for CPU exceptions (vectors 0–31) that prints all registers and halts.
+  - Wired `interrupts_handler()` to call the appropriate entry from `dispatch_table` based on the vector number.
+- **Improved project organisation:**
+  - Reordered declarations in `interrupts.c` to avoid incomplete type warnings and `undeclared identifier` errors.
+  - Added `vga.h`, `stdlib.h`, and `ports.h` header files to centralise function prototypes.
+
+### Changed
+- **Fixed PIT frequency** – now correctly sends both the low and high bytes of the divider, resulting in a precise 100 Hz tick rate.
+- Removed unnecessary `outb(0x20, 0x20)` (EOI) from `exception_handler` – it is only needed for hardware IRQs.
+- Updated `boot.asm` to call `init_pit()` and `kernel_main_rs()` (Rust entry point) before enabling interrupts.
+
+### Fixed
+- Corrected the order of definitions in `interrupts.c` to satisfy C’s declaration‑before‑use rule.
+- `pit_handler` now correctly resets `pit_ticks` after reaching 100, preventing overflow and ensuring consistent one‑second intervals.
+
+### Removed
+- (None)
+
+### Security
+- (None)

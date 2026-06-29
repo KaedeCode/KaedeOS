@@ -3,6 +3,7 @@ extern interrupts_handler
 %macro inter 1
 global inter%1
 inter%1:
+    push %1
     %if %1 == 8 || %1 == 10 || %1 == 11 || %1 == 12 || %1 == 13 || %1 == 14 || %1 == 17 || %1 == 21
     %else
         push 0
@@ -45,7 +46,7 @@ inter%1:
     pop r14
     pop r15
 
-    add rsp, 8
+    add rsp, 16
     iretq
 %endmacro
 

@@ -6,7 +6,7 @@ Below is a step-by-step plan for building the operating system kernel, broken do
 |---|---|---|---|
 | 0 | **Foundation** – boot via GRUB (Multiboot2), CPUID/long‑mode checks, transition to 64‑bit, initial page tables (L4/L3/L2 mapping 512 MiB), three entry points (C, C++, Rust) with VGA text output, basic I/O (`inb`/`outb`), `strlen`, Makefile/ISO build | – | ◼ |
 | 1 | Interrupt Descriptor Table (IDT) and exception handlers (`#DE`, `#PF`, `#GP`, `#DF`) – write assembly stubs, register handlers, test with deliberate faults | C + asm | ◼ |
-| 2 | Programmable Interrupt Controller (PIC) remapping and PIT timer (∼100 Hz) – enable IRQ0, increment ticks, print a message every second | C + asm | ◻ |
+| 2 | Programmable Interrupt Controller (PIC) remapping and PIT timer (∼100 Hz) – enable IRQ0, increment ticks, print a message every second | C + asm | ◼ |
 | 3 | PS/2 keyboard driver – read scancodes from port 0x60, translate to ASCII (US layout), store in circular buffer, echo to VGA | C | ◻ |
 | 4 | Physical memory allocator – parse GRUB memory map, build bitmap (4 KiB pages), implement `alloc_page()` / `free_page()` | C | ◻ |
 | 5 | Virtual memory manager – implement `kmalloc()`/`kfree()` with a simple heap (linked list or slab) using the physical allocator | C++ | ◻ |

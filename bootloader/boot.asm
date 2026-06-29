@@ -3,6 +3,7 @@ extern kernel_main
 extern kernel_main_cpp
 extern kernel_main_rs
 extern init_idt
+extern init_pit
 
 section .text
 bits 32
@@ -104,8 +105,12 @@ entry64:
     mov fs, ax
     mov gs, ax
     call init_idt
+    call init_pit
+    call kernel_main_rs
     sti
-    hlt
+    loop:
+        hlt
+        jmp loop
 
 section .bss
 align 4096
