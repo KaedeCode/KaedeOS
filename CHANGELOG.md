@@ -126,3 +126,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - (None)
+
+## [0.5.0] - 2026-07-01
+
+### Added
+- Modular interrupt subsystem architecture:
+  - `idt.c` – IDT setup and loading.
+  - `exceptions.c` – CPU exception handlers (vectors 0–31) with full register dump.
+  - `pit.c` – PIT initialization and timer handler (100 Hz).
+  - `pic.c` – PIC remapping (master 0x20, slave 0x28).
+  - `interrupts.c` – central dispatcher (`interrupts_handler`) and `dispatch_table[256]` with `register_isr()` API.
+- Common header `include/isr.h` defining `struct RegFrame`, `isr_handler_type`, and all public function prototypes.
+- `init_interrupts()` as a single entry point for the whole interrupt subsystem.
+
+### Changed
+- Complete code reorganization: monolithic `interrupts.c` split into separate modules for IDT, exceptions, PIC/PIT, and dispatcher.
+- Handler registration now uses `register_isr()` instead of direct assignment to `dispatch_table`.
+- `ICW()` (PIC remapping) moved to a separate module and called from `init_pit()` (or separately).
+- `boot.asm` now calls `init_interrupts()` instead of separate `init_idt()` and `init_pit()` calls.
+
+### Removed
+- (If `remap_pit.c` or old `interrupts.c` was deleted, mention it here)
+
+### Fixed
+- All compilation errors due to implicit function declarations (added prototypes in `isr.h`).
+- Fixed `old-style function definition` and `implicit-int` warnings.

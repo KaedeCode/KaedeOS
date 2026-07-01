@@ -1,12 +1,19 @@
 # KaedeOS
 
-**KaedeOS** is my educational 64-bit operating system written from scratch.  
+**KaedeOS** is my educational 64‑bit operating system written from scratch.  
 The project is created for a deep understanding of computer operation: from booting to memory management and I/O devices.  
-Currently the kernel can boot via GRUB, switch to long mode, and handle CPU exceptions via an Interrupt Descriptor Table (IDT).
+Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptions, and run a programmable interval timer with a second counter.
 
-## Screenshot
+## Screenshots
 
-![KaedeOS booting in QEMU](screenshots/2026-06-21_08-45-47.png)
+![Three language entry points](screenshots/entry_points.png)  
+*C (white), C++ (yellow), and Rust (red) entry points – each prints its own message with a distinct colour.*
+
+![PIT timer counter](screenshots/timer.png)  
+*PIT timer running: seconds counter displayed on VGA (0x0F white on black).*
+
+![CPU exception handler](screenshots/exception.png)  
+*Divide-by-zero exception (#DE) caught – full register dump printed to VGA.*
 
 ## Project Structure
 
@@ -16,17 +23,27 @@ KaedeOS/
 │   ├── boot.asm
 │   └── multiboot_header.asm
 ├── drivers/
-│   └── vga.c
+│   ├── vga.c
+│   └── pit.c
 ├── kernel/
 │   ├── kernel.c
 │   ├── kernel.cpp
 │   ├── kernel.rs
+│   ├── isr.asm
+│   ├── idt.c
+│   ├── exceptions.c
 │   ├── interrupts.c
-│   └── isr.asm
+│   └── pic.c
 ├── libc/
-│   └── string.c
+│   ├── string.c
+│   └── stdlib.c
 ├── utils/
 │   └── ports.c
+├── include/
+│   ├── ports.h
+│   ├── vga.h
+│   ├── stdlib.h
+│   └── isr.h
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
@@ -38,16 +55,21 @@ KaedeOS/
 
 ## Current Features
 
-- Booting with a Multiboot2 header (GRUB support)
-- CPUID check and long mode support verification
-- Page table setup and transition to 64-bit mode
-- Three independent entry points in C, C++, and Rust — each outputs its own string to VGA with a unique color
-- Basic VGA driver (text output with position and color)
-- I/O utilities: `inb`/`outb`, `strlen`
-- **Interrupt Descriptor Table (IDT) initialized with 256 ISR stubs**:
-  - Correctly handles error codes (pushes dummy `0` when necessary)
-  - Saves and restores full CPU context across interrupts
-  - Successfully catches CPU exceptions (e.g., Divide Error `#DE`) and prints a message to the VGA screen via a C handler
+- **Multiboot2 boot** – boots via GRUB with a valid header.
+- **CPU checks** – verifies CPUID and long‑mode support; sets up initial page tables (L4/L3/L2 mapping 512 MiB).
+- **64‑bit long mode** – successfully transitions to 64‑bit mode with a custom GDT.
+- **Three language entry points** – C, C++, and Rust each print their own message with a distinct colour (white, yellow, red) directly to VGA.
+- **VGA text driver** – `vga_write()` with configurable row, column, and colour.
+- **I/O utilities** – `inb()` / `outb()` for port access.
+- **Minimal libc** – `strlen()` and `long_to_hex()` for hexadecimal conversion.
+- **Full interrupt subsystem**:
+  - **IDT** with 256 interrupt gates, correctly handling error codes (dummy push when needed).
+  - **Assembly stubs** save and restore all general‑purpose registers; call the C dispatcher.
+  - **CPU exception handlers** (vectors 0‑31) – print all registers and halt on fault.
+  - **Programmable Interrupt Controller (PIC)** – remapped to vectors 0x20 (master) and 0x28 (slave).
+  - **PIT timer** – configured to ~100 Hz; increments a seconds counter and displays it on screen.
+  - **Modular registration API** – any driver can register its handler via `register_isr(vector, handler)`.
+- **Centralised initialisation** – `init_interrupts()` sets up IDT, exceptions, PIC, and PIT in one call.
 
 ### Requirements
 
