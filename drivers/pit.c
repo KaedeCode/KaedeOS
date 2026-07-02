@@ -1,7 +1,8 @@
 #include <ports.h>
 #include <vga.h>
-#include <stdlib.h>
 #include <isr.h>
+#include <pic.h>
+#include <stdlib.h>
 
 static volatile unsigned char pit_ticks = 0;
 static volatile unsigned long pit_sec = 0;
@@ -24,6 +25,6 @@ void init_pit() {
     outb(0x40, 11931);
     outb(0x40, 11931 >> 8);
     ICW();
-    outb(0x21, inb(0x21) & 0xFE);
+    enable_pic(0);
     register_isr(0x20, pit_handler);
 };

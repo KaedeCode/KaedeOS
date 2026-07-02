@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <ports.h>
 #include <isr.h>
 extern void (*idt_stubs_point[256])();
 
@@ -22,7 +21,7 @@ struct IDT_struct IDT[256];
 
 void init_idt() {
     for (int i = 0; i <= 255; i++) {
-        uint64_t isp = (uint64_t)idt_stubs_point[i];
+        unsigned long isp = (unsigned long)idt_stubs_point[i];
         IDT[i].offset_low = (isp & 0b1111111111111111);
         IDT[i].segment_selector = 0x08;
         IDT[i].ist_flags = 0;

@@ -5,7 +5,7 @@ const char *FrameName[] = { "RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "RBP", "R8
 
 void exception_handler(struct RegFrame *pointer) {
     volatile struct RegFrame *regs = pointer;
-    for(unsigned char i = 0; i != 21; i++) {
+    for(unsigned char i = 0; i != 22; i++) {
         unsigned long value = *(((unsigned long*)regs) + i);
         vga_write(FrameName[i], i, 0, 0x0f);
         vga_write(":", i, 3, 0x0f);

@@ -1,4 +1,7 @@
 #include <isr.h>
+#include <pic.h>
+#include <ports.h>
+
 
 isr_handler_type dispatch_table[256];
 
@@ -6,6 +9,8 @@ void init_interrupts() {
     init_idt();
     init_exceptions();
     init_pit();
+    outb(0x21, master_mask);
+    outb(0xA1, slave_mask);
 };
 
 void register_isr(int vector, isr_handler_type handler) {

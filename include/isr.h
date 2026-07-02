@@ -1,6 +1,4 @@
-#ifndef ISR_H
-#define ISR_H
-
+#pragma once
 
 struct RegFrame {
     unsigned long rax, rbx, rcx, rdx, rsi, rdi, rbp;
@@ -19,6 +17,3 @@ void register_isr(int vector, isr_handler_type handler);
 void init_idt(void);
 void init_exceptions(void);
 void init_pit(void);
-void ICW(void);
-
-#endif
