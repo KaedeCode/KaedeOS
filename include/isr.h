@@ -9,6 +9,7 @@ struct RegFrame {
 };
 
 typedef void(*isr_handler_type)(struct RegFrame*);
+typedef struct RegFrame RegFrame;
 
 extern isr_handler_type dispatch_table[256];
 

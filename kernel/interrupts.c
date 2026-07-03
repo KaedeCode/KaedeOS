@@ -1,7 +1,7 @@
 #include <isr.h>
 #include <pic.h>
 #include <ports.h>
-
+#include <keyboard.h>
 
 isr_handler_type dispatch_table[256];
 
@@ -9,6 +9,7 @@ void init_interrupts() {
     init_idt();
     init_exceptions();
     init_pit();
+    init_keyboard();
     outb(0x21, master_mask);
     outb(0xA1, slave_mask);
 };
@@ -17,6 +18,6 @@ void register_isr(int vector, isr_handler_type handler) {
     dispatch_table[vector] = handler;
 };
 
-void interrupts_handler(struct RegFrame *pointer) {
-    dispatch_table[pointer->vector](pointer);
+void interrupts_handler(RegFrame *frame) {
+    dispatch_table[frame->vector](frame);
 }

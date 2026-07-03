@@ -31,6 +31,10 @@ void init_idt() {
         IDT[i].reserved = 0;
     };
 
+    IDT[0x03].type_attributes = 0b10001111;
+    IDT[0x04].type_attributes = 0b10001111;
+    IDT[0x80].type_attributes = 0b10001111;
+
     struct IDT_pointer data = { 0x0FFF, (unsigned long)&IDT };
 
     __asm__ __volatile__ (
