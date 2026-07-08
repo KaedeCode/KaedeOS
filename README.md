@@ -2,7 +2,7 @@
 
 **KaedeOS** is my educational 64‑bit operating system written from scratch.  
 The project is created for a deep understanding of computer operation: from booting to memory management and I/O devices.  
-Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptions, and run a programmable interval timer with a second counter.
+Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptions, run a programmable interval timer, and handle keyboard input via PS/2.
 
 ## Screenshots
 
@@ -15,35 +15,42 @@ Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptio
 ![CPU exception handler](screenshots/exception.png)  
 *Divide-by-zero exception (#DE) caught – full register dump printed to VGA.*
 
+![Keyboard input demo](screenshots/keyboard_input.png)
+*PS/2 keyboard driver in action – typing echoes characters to the VGA buffer in real time.*
+
 ## Project Structure
 
 ```
 KaedeOS/
 ├── bootloader/
-│   ├── boot.asm
-│   └── multiboot_header.asm
+│ ├── boot.asm
+│ └── multiboot_header.asm
 ├── drivers/
-│   ├── vga.c
-│   └── pit.c
+│ ├── vga.c
+│ ├── pit.c
+│ └── keyboard.c
 ├── kernel/
-│   ├── kernel.c
-│   ├── kernel.cpp
-│   ├── kernel.rs
-│   ├── isr.asm
-│   ├── idt.c
-│   ├── exceptions.c
-│   ├── interrupts.c
-│   └── pic.c
+│ ├── kernel.c
+│ ├── kernel.cpp
+│ ├── kernel.rs
+│ ├── isr.asm
+│ ├── idt.c
+│ ├── exceptions.c
+│ ├── interrupts.c
+│ └── pic.c
 ├── libc/
-│   ├── string.c
-│   └── stdlib.c
+│ ├── string.c
+│ └── stdlib.c
 ├── utils/
-│   └── ports.c
+│ └── ports.c
 ├── include/
-│   ├── ports.h
-│   ├── vga.h
-│   ├── stdlib.h
-│   └── isr.h
+│ ├── ports.h
+│ ├── vga.h
+│ ├── stdlib.h
+│ ├── isr.h
+│ ├── pic.h
+│ ├── pit.h
+│ └── keyboard.h
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
@@ -53,6 +60,7 @@ KaedeOS/
 └── linker.ld
 ```
 
+
 ## Current Features
 
 - **Multiboot2 boot** – boots via GRUB with a valid header.
@@ -61,15 +69,16 @@ KaedeOS/
 - **Three language entry points** – C, C++, and Rust each print their own message with a distinct colour (white, yellow, red) directly to VGA.
 - **VGA text driver** – `vga_write()` with configurable row, column, and colour.
 - **I/O utilities** – `inb()` / `outb()` for port access.
-- **Minimal libc** – `strlen()` and `long_to_hex()` for hexadecimal conversion.
+- **Minimal libc** – `strlen()`, `long_to_hex()` for hexadecimal conversion, and `get_second()` for PIT time.
 - **Full interrupt subsystem**:
   - **IDT** with 256 interrupt gates, correctly handling error codes (dummy push when needed).
   - **Assembly stubs** save and restore all general‑purpose registers; call the C dispatcher.
   - **CPU exception handlers** (vectors 0‑31) – print all registers and halt on fault.
   - **Programmable Interrupt Controller (PIC)** – remapped to vectors 0x20 (master) and 0x28 (slave).
   - **PIT timer** – configured to ~100 Hz; increments a seconds counter and displays it on screen.
+  - **PS/2 keyboard driver** – reads scancodes from port `0x60`, handles extended sequences, translates to ASCII (US layout), stores in a circular buffer, and supports modifiers (Shift, Caps, Ctrl, Alt).
   - **Modular registration API** – any driver can register its handler via `register_isr(vector, handler)`.
-- **Centralised initialisation** – `init_interrupts()` sets up IDT, exceptions, PIC, and PIT in one call.
+- **Centralised initialisation** – `init_interrupts()` sets up IDT, exceptions, PIC, PIT, and keyboard in one call.
 
 ### Requirements
 

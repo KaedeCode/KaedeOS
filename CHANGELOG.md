@@ -151,3 +151,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - All compilation errors due to implicit function declarations (added prototypes in `isr.h`).
 - Fixed `old-style function definition` and `implicit-int` warnings.
+
+## [0.6.0] - 2026-07-09
+
+### Added
+- **Step 3 completed: PS/2 keyboard driver.**
+  - Implemented `keyboard_handler()` to read scancodes from port `0x60`.
+  - Handles extended scan codes (e.g., arrow keys, keypad) by prefixing with `0x80`.
+  - Translates scancodes to US ASCII characters using `ascii_map` and supports modifier states (Shift, Caps Lock, Ctrl, Alt, etc.).
+  - Stores keyboard events and plain characters in separate ring buffers (`key_state`, `ring_buffer`, `event_queue`).
+  - Exported `read_char()`, `read_event()`, and `get_key_state()` functions via `keyboard.h`.
+  - Added keyboard initialization to `init_interrupts()` via `init_keyboard()`.
+- **Updated `kernel.rs` demo**: Replaced the static PIT text with an interactive keyboard echo demo that reads and displays pressed keys on VGA.
+- **New header files**: Added `include/keyboard.h` (with scancode definitions) and `include/pit.h` (with `get_second()`).
+- **PIT improvements**: Added `get_second()` function to `pit.c` to retrieve the current seconds counter from external code.
+
+### Changed
+- `interrupts.c` now automatically calls `init_keyboard()` inside `init_interrupts()`.
+- Updated `ROADMAP.md`: Step 3 status changed from `◻` to `◼`.
+
+### Fixed
+- Minor bugs in `pit.c` and `stdlib.c` resolved (code cleanup and consistency).
+- Removed unused variables and correct type casting in the keyboard module.
+
+### Removed
+- (None)
