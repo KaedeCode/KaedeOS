@@ -23,7 +23,6 @@ pub extern "C" fn kernel_main_rs() {
 
     let mut col = 0;
     loop {
-        // 2. Читаем символ из буфера
         let ch = unsafe { read_char() };
 
         if ch != 0 {

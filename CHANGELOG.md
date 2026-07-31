@@ -176,3 +176,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - (None)
+
+## [0.7.0] - 2026-07-31
+
+### Added
+- **Step 4 started: Physical Memory Manager (PMM) and Multiboot2 information parsing.**
+  - Added `Multiboot2Info` class (C++) to read and parse multiboot2 tags, including the memory map (tag type 6).
+  - Implemented `pmm_init(uint64_t mbi_addr)` which initializes the physical memory bitmap (`pmm_bitmap[BITMAP_SIZE]`) by marking all pages as used (`0xFF`) as a starting point.
+  - Added `pmm.h` and `multiboot.hpp` headers with necessary declarations.
+  - Extended the boot sequence: `boot.asm` now passes the multiboot magic number (in `EAX`) and the multiboot info structure address (in `EBX`) to `pmm_init()` in long mode, using `RDI` and `RSI`.
+- **New files:**
+  - `kernel/pmm.c` – placeholder for physical memory allocation logic.
+  - `kernel/multiboot.cpp` – implementation of the Multiboot2 info parser.
+  - `include/pmm.h`, `include/multiboot.hpp` – public interfaces.
+
+### Changed
+- `boot.asm`: after entering long mode, `pmm_init` is called with `rdi = eax` (magic) and `rsi = ebx` (info address) before initialising interrupts and jumping to the Rust kernel.
+
+### Deprecated
+- (None)
+
+### Removed
+- (None)
+
+### Fixed
+- (None)
+
+### Security
+- (None)

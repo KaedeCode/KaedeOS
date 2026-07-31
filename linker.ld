@@ -5,6 +5,8 @@ SECTIONS
 {
     . = 1M;
 
+    _start = .;
+
     .boot :
     {
         KEEP(*(.multiboot_header))
@@ -29,5 +31,6 @@ SECTIONS
     {
         *(COMMON)
         *(.bss)
+        _end = .;
     }
 }

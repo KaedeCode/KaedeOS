@@ -281,10 +281,10 @@ void keyboard_handler(RegFrame *frame) {
 
     key_state[scancode] = pressed;
 
-    if (scancode == 0x38 && (scancode & 0x80)) {
+    if (scancode == 0xB8) {
         if (pressed) modifier_keys |= MOD_ALTGR;
         else modifier_keys &= ~MOD_ALTGR;
-    } else if (scancode == 0x1D && (scancode & 0x80)) {
+    } else if (scancode == 0x9D) {
         if (pressed) modifier_keys |= MOD_CTRL;
         else modifier_keys &= ~MOD_CTRL;
     } else {

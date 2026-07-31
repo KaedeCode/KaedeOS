@@ -3,6 +3,7 @@ extern kernel_main
 extern kernel_main_cpp
 extern kernel_main_rs
 extern init_interrupts
+extern pmm_init
 
 section .text
 bits 32
@@ -103,6 +104,9 @@ entry64:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    movzx rdi, eax
+    movzx rsi, ebx
+    call pmm_init
     call init_interrupts
     call kernel_main_rs
     sti
