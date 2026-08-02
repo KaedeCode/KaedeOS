@@ -204,3 +204,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - (None)
+
+## [0.8.0] - 2026-08-02
+
+### Changed
+- **Multiboot2 parser completely rewritten in C** – the previous C++ class (`Multiboot2Info`) has been replaced by a set of plain C functions:
+  - `multiboot2_init()`
+  - `multiboot2_find_tag()`
+  - `multiboot2_get_memory_map()`
+  - This makes the code easier to integrate with the rest of the kernel (no C++ runtime dependencies) and simplifies the build process.
+- Updated `pmm_init()` to call the new C API and to use `memset()` for initialising the physical memory bitmap.
+
+### Added
+- **`memset` function** – added to `libc/string.c` with a prototype in `include/string.h`. This is now used by the PMM and can be reused elsewhere.
+
+### Removed
+- `kernel/multiboot.cpp` and `include/multiboot.hpp` (no longer needed).
+
+### Fixed
+- (None)
+
+### Deprecated
+- (None)
