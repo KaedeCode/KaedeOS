@@ -16,18 +16,15 @@ typedef struct {
     int is_valid;
 } Multiboot2Info;
 
-void multiboot2_init(Multiboot2Info* info, uint32_t magic, uint64_t addr);
+void multiboot2_init(uint32_t magic, uint64_t addr);
 
-static inline int multiboot2_is_valid(const Multiboot2Info* info) {
-    return info->is_valid;
-}
+int multiboot2_is_valid(void);
 
-static inline uint32_t multiboot2_get_total_size(const Multiboot2Info* info) {
-    return info->total_size;
-}
+uintptr_t multiboot2_get_mbi_start(void);
+uint32_t multiboot2_get_total_size(void);
 
-void* multiboot2_find_tag(const Multiboot2Info* info, uint32_t type);
+void* multiboot2_find_tag(uint32_t type);
 
-void multiboot2_get_memory_map(const Multiboot2Info* info, const struct memory_map_entry** out_entries, uint32_t* out_count);
+void multiboot2_get_memory_map(const struct memory_map_entry** out_entries, uint32_t* out_count);
 
 #endif

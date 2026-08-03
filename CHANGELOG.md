@@ -226,3 +226,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 - (None)
+
+## [0.9.0] - 2026-08-03
+
+### Added
+- **Step 4 completed: Physical Memory Manager (PMM) and Multiboot2 information parsing.**
+  - Implemented a physical memory allocator based on a bitmap (`pmm_bitmap`) for 4 KiB pages.
+  - Parsed the Multiboot2 memory map (tag type 6) to discover available RAM regions.
+  - Marked the kernel, the PMM bitmap itself, and the first page (null pointer trap) as used.
+  - Exported `alloc_page()` and `free_page()` for dynamic physical page allocation.
+  - Integrated PMM initialisation into the boot sequence: `boot.asm` now calls `multiboot2_init()` and `pmm_init()` before enabling interrupts.
+- **Multiboot2 parser written in C** – provides `multiboot2_init()`, `multiboot2_find_tag()`, and `multiboot2_get_memory_map()` for other kernel components.
+- **Updated C++ kernel demo** – now allocates a physical page, writes a test string into it, and displays the page address on the VGA screen, demonstrating that the PMM works.
+
+### Changed
+- The bootloader now passes the multiboot magic and info structure address to the kernel using `RDI` and `RSI` in long mode.
+
+### Fixed
+- (None)
+
+### Deprecated
+- (None)

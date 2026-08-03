@@ -2,7 +2,7 @@
 
 **KaedeOS** is my educational 64‑bit operating system written from scratch.  
 The project is created for a deep understanding of computer operation: from booting to memory management and I/O devices.  
-Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptions, run a programmable interval timer, and handle keyboard input via PS/2.
+Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptions, run a programmable interval timer, handle keyboard input via PS/2, and manage physical memory through a bitmap allocator.
 
 ## Screenshots
 
@@ -17,6 +17,9 @@ Currently the kernel can boot via GRUB, switch to long mode, handle CPU exceptio
 
 ![Keyboard input demo](screenshots/keyboard_input.png)
 *PS/2 keyboard driver in action – typing echoes characters to the VGA buffer in real time.*
+
+![PMM allocation demo](screenshots/pmm.png)
+*Physical Memory Manager (PMM) demo – a physical page is allocated, a test string is written into it, and its address (in hex) is displayed on the VGA screen.*
 
 ## Project Structure
 
@@ -37,7 +40,9 @@ KaedeOS/
 │ ├── idt.c
 │ ├── exceptions.c
 │ ├── interrupts.c
-│ └── pic.c
+│ ├── pic.c
+│ ├── multiboot.c # Multiboot2 parser
+│ └── pmm.c # Physical Memory Manager
 ├── libc/
 │ ├── string.c
 │ └── stdlib.c
@@ -50,7 +55,10 @@ KaedeOS/
 │ ├── isr.h
 │ ├── pic.h
 │ ├── pit.h
-│ └── keyboard.h
+│ ├── keyboard.h
+│ ├── multiboot.h
+│ ├── pmm.h
+│ └── string.h
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
@@ -59,7 +67,6 @@ KaedeOS/
 ├── CHANGELOG.md
 └── linker.ld
 ```
-
 
 ## Current Features
 
@@ -78,6 +85,8 @@ KaedeOS/
   - **PIT timer** – configured to ~100 Hz; increments a seconds counter and displays it on screen.
   - **PS/2 keyboard driver** – reads scancodes from port `0x60`, handles extended sequences, translates to ASCII (US layout), stores in a circular buffer, and supports modifiers (Shift, Caps, Ctrl, Alt).
   - **Modular registration API** – any driver can register its handler via `register_isr(vector, handler)`.
+- **Physical Memory Manager (PMM)** – parses the Multiboot2 memory map, maintains a bitmap of free 4 KiB pages, and provides `alloc_page()` / `free_page()` for the kernel.
+- **Multiboot2 support** – reads the memory map and other tags provided by the bootloader, making them available to kernel modules.
 - **Centralised initialisation** – `init_interrupts()` sets up IDT, exceptions, PIC, PIT, and keyboard in one call.
 
 ### Requirements

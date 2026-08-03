@@ -2,15 +2,20 @@ global start
 extern kernel_main
 extern kernel_main_cpp
 extern kernel_main_rs
-extern init_interrupts
+extern multiboot2_init
 extern pmm_init
+extern init_interrupts
+
+section .data
+multiboot_magic: dd 0
+multiboot_addr:  dd 0
 
 section .text
 bits 32
 start:
     mov esp, stack_top
-    push eax
-    push ebx
+    mov [multiboot_magic], eax
+    mov [multiboot_addr], ebx
     call check_multiboot
     call check_cpuid
     call check_long_mode
@@ -104,11 +109,12 @@ entry64:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    movzx rdi, eax
-    movzx rsi, ebx
+    mov edi, dword [multiboot_magic]
+    mov esi, dword [multiboot_addr]
+    call multiboot2_init
     call pmm_init
     call init_interrupts
-    call kernel_main_rs
+    call kernel_main_cpp
     sti
     loop:
         hlt
